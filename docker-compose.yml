@@ -1,16 +1,25 @@
 version: '2'
+networks:
+  my_net:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
 services:
   gitlab:
     image: gitlab/gitlab-ce:latest
     container_name: gitlab-local
     hostname: gitlab.example.com
+    networks:
+      my_net:
+        ipv4_address: 10.5.0.6
     ports:
       - "80:80"
       - "8443:443"
       - "2222:22"
     environment:
       - GITLAB_ROOT_PASSWORD=1234root
-      - GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.example.com:80'; gitlab_rails['gitlab_shell_ssh_port']=2222;"
     volumes:
       - ${HOME}/gitlab-data/config:/etc/gitlab
       - ${HOME}/gitlab-data/logs:/var/log/gitlab
@@ -19,18 +28,20 @@ services:
   gitlab-runner:
     image: gitlab/gitlab-runner:latest
     container_name: gitlab-runner
-    dns_search: gitlab.example.com
+    networks:
+        - my_net
     extra_hosts:
-      - "gitlab.example.com:172.18.0.2"
+        - "gitlab.example.com:10.5.0.6"
     volumes:
       - ${HOME}/gitlab-runner/config:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
     environment:
-        - CI_SERVER_URL=http://gitlab.example.com/
-        - REGISTRATION_TOKEN=Ln7_5ErzcYgWgmxr5t3m
+        - CI_SERVER_URL=http://gitlab/ci
+        - REGISTRATION_TOKEN=gSy7qrdnwzTu_8e7sNxk
         - RUNNER_NAME=gradle_docker
         - RUNNER_EXECUTOR=docker
         - DOCKER_IMAGE=gradle
+        - DOCKER_NETWORK_MODE=setup_my_net
+        - DOCKER_EXTRA_HOSTS=gitlab.example.com:10.5.0.6
 # Notice that it matches exactly the network found in docker network ls
-        - DOCKER_NETWORK_MODE=gitlab_gitlab_net
-        - DOCKER_EXTRA_HOSTS=gitlab.example.com:172.18.0.2
