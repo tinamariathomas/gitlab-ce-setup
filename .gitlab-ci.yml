@@ -1,0 +1,14 @@
+image: gradle
+
+stages:
+  - analyze-dependencies
+
+inspect:
+  stage: analyze-dependencies
+  script:
+    - git clone $REPO_URL 
+    - cd testing
+    - cat ../buildscript
+    - cat ../buildscript >> build.gradle
+    - cat build.gradle
+    - gradle dependencyCheckAnalyze --info

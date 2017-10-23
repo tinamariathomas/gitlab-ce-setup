@@ -1,0 +1,15 @@
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.owasp:dependency-check-gradle:2.1.0'
+    }
+}
+
+apply plugin: 'org.owasp.dependencycheck'
+
+dependencyCheck {
+    failBuildOnCVSS=5
+}
