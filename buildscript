@@ -11,5 +11,6 @@ buildscript {
 apply plugin: 'org.owasp.dependencycheck'
 
 dependencyCheck {
+    outputDirectory='dependencyCheckReport'
     failBuildOnCVSS=5
 }

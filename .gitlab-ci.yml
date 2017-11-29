@@ -12,3 +12,6 @@ inspect:
     - cat ../buildscript >> build.gradle
     - cat build.gradle
     - gradle dependencyCheckAnalyze --info
+  artifacts:
+    paths:
+    - dependencyCheckReport
