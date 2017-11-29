@@ -6,10 +6,12 @@ stages:
 inspect:
   stage: analyze-dependencies
   script:
+    - defaultThreshold=11
+    - threshold=$(echo ${failBuildOnCVSS} | sed s/^$/${defaultThreshold}/g)
     - git clone $REPO_URL 
     - cd testing
-    - cat ../buildscript
-    - cat ../buildscript >> build.gradle
+    - sed s/\<failBuildOnCVSS\>/${threshold}/g ../buildscript > gradleTask
+    - cat gradleTask >> build.gradle
     - cat build.gradle
     - gradle dependencyCheckAnalyze --info
   artifacts:
